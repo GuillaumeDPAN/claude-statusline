@@ -10,6 +10,7 @@ Originally inspired by [contextbricks](https://www.npmjs.com/package/contextbric
 [Opus] my-project:main *↑2 | +156/-23
 [a1b2c3d] Add authentication system
 [■■■■■■■■□□□□□□□□□□□□□□□□□□□□□□] 25% | 150k free | 0h12m | $0.50
+5h: 51% ↻ 3h06 | 7d: 48% ↻ ven 12:00
 ```
 
 ## Features
@@ -17,6 +18,7 @@ Originally inspired by [contextbricks](https://www.npmjs.com/package/contextbric
 - **Line 1**: Model | Repo:Branch | Git status (dirty/ahead/behind) | Lines changed
 - **Line 2**: Last commit hash + message
 - **Line 3**: Context bricks (30 blocks) | Usage % | Free tokens | Duration | Cost
+- **Line 4**: Rate limits — 5h session % + reset time | 7d weekly % + reset day (Pro/Max only, color-coded: green <70%, yellow 70-89%, red 90%+)
 
 ## Requirements
 
@@ -67,6 +69,8 @@ Claude Code pipes JSON session data to the script via stdin. The script parses i
 | Free tokens | Calculated from `remaining_percentage` |
 | Duration | `cost.total_duration_ms` |
 | Cost | `cost.total_cost_usd` |
+| Rate limits (5h/7d) | `rate_limits.five_hour/seven_day.used_percentage` |
+| Reset times | `rate_limits.five_hour/seven_day.resets_at` |
 
 ## Windows notes
 
