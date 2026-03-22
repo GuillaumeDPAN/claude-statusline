@@ -99,8 +99,51 @@ try {
   let line3 = `[${bricks}] \x1b[1m${usedPct}%\x1b[0m | \x1b[1;32m${freeK}k free\x1b[0m | ${hours}h${mins}m`;
   if (cost > 0) line3 += ` | \x1b[0;33m$${cost.toFixed(2)}\x1b[0m`;
 
+  // Line 4: Rate limits (Pro/Max only)
+  let line4 = '';
+  const rl = data.rate_limits;
+  if (rl) {
+    const colorFor = (pct) => pct >= 90 ? '\x1b[1;31m' : pct >= 70 ? '\x1b[1;33m' : '\x1b[1;32m';
+    const RST = '\x1b[0m';
+    const parts = [];
+
+    if (rl.five_hour?.used_percentage != null) {
+      const pct5 = Math.round(rl.five_hour.used_percentage);
+      const resetAt = rl.five_hour.resets_at;
+      let resetStr = '';
+      if (resetAt) {
+        const diffMs = resetAt * 1000 - Date.now();
+        if (diffMs > 0) {
+          const h = Math.floor(diffMs / 3600000);
+          const m = Math.floor((diffMs % 3600000) / 60000);
+          resetStr = ` ↻ ${h}h${String(m).padStart(2, '0')}`;
+        }
+      }
+      parts.push(`${colorFor(pct5)}5h: ${pct5}%${resetStr}${RST}`);
+    }
+
+    if (rl.seven_day?.used_percentage != null) {
+      const pct7 = Math.round(rl.seven_day.used_percentage);
+      const resetAt = rl.seven_day.resets_at;
+      let resetStr = '';
+      if (resetAt) {
+        const resetDate = new Date(resetAt * 1000);
+        const days = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
+        const dayName = days[resetDate.getDay()];
+        const hh = String(resetDate.getHours()).padStart(2, '0');
+        const mm = String(resetDate.getMinutes()).padStart(2, '0');
+        resetStr = ` ↻ ${dayName} ${hh}:${mm}`;
+      }
+      parts.push(`${colorFor(pct7)}7d: ${pct7}%${resetStr}${RST}`);
+    }
+
+    if (parts.length) line4 = parts.join(' | ');
+  }
+
   // Output
-  const output = line2 ? `${line1}\n${line2}\n${line3}\n` : `${line1}\n${line3}\n`;
+  let output = line2 ? `${line1}\n${line2}\n${line3}` : `${line1}\n${line3}`;
+  if (line4) output += `\n${line4}`;
+  output += '\n';
   fs.writeFileSync(1, output);
 
 } catch (e) {
