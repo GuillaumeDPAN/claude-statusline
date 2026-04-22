@@ -58,7 +58,7 @@ try {
   let repoName = '', branch = '', commitShort = '', commitMsg = '', gitStatus = '';
   const cwd = data.workspace?.current_dir || data.cwd || process.cwd();
 
-  const gitOpts = { cwd, encoding: 'utf8', timeout: 3000, stdio: ['pipe', 'pipe', 'pipe'] };
+  const gitOpts = { cwd, encoding: 'utf8', timeout: 3000, stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' } };
   try {
     repoName = execSync('git rev-parse --show-toplevel', gitOpts).trim().split(/[\\/]/).pop();
     branch = execSync('git branch --show-current', gitOpts).trim() || 'detached';
